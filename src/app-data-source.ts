@@ -5,7 +5,7 @@ const bd = new DataSource({
     host: "localhost",
     port: 3306,
     username: "root",
-    password: "Jv410551",
+    password: "joseaa",
     database: "test",
     entities: ["src/entities/usuario.js"],
     logging: true,
