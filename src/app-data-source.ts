@@ -6,8 +6,8 @@ const bd = new DataSource({
     port: 3306,
     username: "root",
     password: "Jv410551",
-    database: "test",
-    entities: ["src/entities/usuario.js"],
+    database: "todolist",
+    entities: ["src/entities/Tasks.js"],
     logging: true,
     synchronize: true,
 });

@@ -37,7 +37,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var express = require("express");
-var usuario_1 = require("./entities/usuario");
+var cors = require("cors");
+var Tasks_1 = require("./entities/Tasks");
 var app_data_source_1 = require("./app-data-source");
 app_data_source_1.bd
     .initialize()
@@ -48,11 +49,12 @@ app_data_source_1.bd
 });
 var app = express();
 app.use(express.json());
-app.get('/users', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.use(cors());
+app.get('/tasks', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario).find()];
+            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(Tasks_1.Tasks).find()];
             case 1:
                 response = _a.sent();
                 res.send(response);
@@ -60,11 +62,11 @@ app.get('/users', function (req, res) { return __awaiter(void 0, void 0, void 0,
         }
     });
 }); });
-app.get('/users/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.get('/tasks/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario).findOneBy({
+            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(Tasks_1.Tasks).findOneBy({
                     Id: req.params.id
                 })];
             case 1:
@@ -74,14 +76,14 @@ app.get('/users/:id', function (req, res) { return __awaiter(void 0, void 0, voi
         }
     });
 }); });
-app.post('/users', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.post('/tasks', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var user, results;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario).create(req.body)];
+            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(Tasks_1.Tasks).create(req.body)];
             case 1:
                 user = _a.sent();
-                return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario).save(user)];
+                return [4 /*yield*/, app_data_source_1.bd.getRepository(Tasks_1.Tasks).save(user)];
             case 2:
                 results = _a.sent();
                 res.send(results);
@@ -89,17 +91,17 @@ app.post('/users', function (req, res) { return __awaiter(void 0, void 0, void 0
         }
     });
 }); });
-app.put('/users/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.put('/tasks/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response, results;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario).findOneBy({
+            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(Tasks_1.Tasks).findOneBy({
                     Id: req.params.id
                 })];
             case 1:
                 response = _a.sent();
-                app_data_source_1.bd.getRepository(usuario_1.Usuario).merge(response, req.body);
-                return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario).save(response)];
+                app_data_source_1.bd.getRepository(Tasks_1.Tasks).merge(response, req.body);
+                return [4 /*yield*/, app_data_source_1.bd.getRepository(Tasks_1.Tasks).save(response)];
             case 2:
                 results = _a.sent();
                 res.send(results);
@@ -107,11 +109,11 @@ app.put('/users/:id', function (req, res) { return __awaiter(void 0, void 0, voi
         }
     });
 }); });
-app["delete"]('/users/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app["delete"]('/tasks/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario)["delete"](req.params.id)];
+            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(Tasks_1.Tasks)["delete"](req.params.id)];
             case 1:
                 response = _a.sent();
                 res.send(response);

@@ -1,6 +1,7 @@
 import * as express from 'express';
+import * as cors from 'cors';
 import { Request, Response } from 'express-serve-static-core';
-import { Usuario } from './entities/usuario';
+import { Tasks } from './entities/Tasks';
 import { bd } from './app-data-source';
 
 bd
@@ -14,36 +15,46 @@ bd
 
 const app = express(); 
 app.use(express.json()); 
+app.use(cors());
 
-app.get('/users', async(req: Request, res: Response) => {
-    const response = await bd.getRepository(Usuario).find();
+app.get('/tasks', async(req: Request, res: Response) => {
+    const response = await bd.getRepository(Tasks).find();
     res.send(response);
 });
 
-app.get('/users/:id', async(req: Request, res: Response) => {
-    const response = await bd.getRepository(Usuario).findOneBy({
+app.get('/tasks/:id', async(req: Request, res: Response) => {
+    const response = await bd.getRepository(Tasks).findOneBy({
         Id: req.params.id,
     });
     res.send(response);
 });
 
-app.post('/users', async(req: Request, res: Response) => {
-    const user = await bd.getRepository(Usuario).create(req.body);
-    const results = await bd.getRepository(Usuario).save(user);
+app.post('/tasks', async(req: Request, res: Response) => {
+    const user = await bd.getRepository(Tasks).create(req.body);
+    const results = await bd.getRepository(Tasks).save(user);
     res.send(results);
 });
 
-app.put('/users/:id', async(req: Request, res: Response) => {
-    const response = await bd.getRepository(Usuario).findOneBy({
+app.put('/tasks/:id', async(req: Request, res: Response) => {
+   const done = await bd.getRepository(Tasks).findOneBy({
+    Id: req.params.id
+   });
+   bd.getRepository(Tasks).merge(done, req.body);
+   const response = await bd.getRepository(Tasks).save(done);
+   res.send(response);
+});
+
+app.put('/tasks/:id', async(req: Request, res: Response) => {
+    const response = await bd.getRepository(Tasks).findOneBy({
         Id: req.params.id
     });
-    bd.getRepository(Usuario).merge(response, req.body);
-    const results = await bd.getRepository(Usuario).save(response);
+    bd.getRepository(Tasks).merge(response, req.body);
+    const results = await bd.getRepository(Tasks).save(response);
     res.send(results);
 });
 
-app.delete('/users/:id', async(req: Request, res: Response) => {
-    const response = await bd.getRepository(Usuario).delete(req.params.id);
+app.delete('/tasks/:id', async(req: Request, res: Response) => {
+    const response = await bd.getRepository(Tasks).delete(req.params.id);
     res.send(response);
 });
 
