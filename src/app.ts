@@ -5,13 +5,13 @@ import { Tasks } from './entities/Tasks';
 import { bd } from './app-data-source';
 
 bd
-.initialize()
-.then(() => {
-    console.log('The database has been initialized');
-})
-.catch((err) => {
-    console.log("The databse hasn't been initialized", err);
-});
+    .initialize()
+    .then(() => {
+        console.log('The database has been initialized');
+    })
+    .catch((err) => {
+        console.log("The databse hasn't been initialized", err);
+    });
 
 const app = express(); 
 app.use(express.json()); 
