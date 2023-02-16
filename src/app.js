@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var express = require("express");
 var index_1 = require("./index");
+require("dotenv-safe");
 var cors = require("cors");
 index_1.database
     .initialize()
