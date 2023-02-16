@@ -37,9 +37,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var express = require("express");
-var usuario_1 = require("./entities/usuario");
-var app_data_source_1 = require("./app-data-source");
-app_data_source_1.bd
+var index_1 = require("./index");
+var cors = require("cors");
+index_1.database
     .initialize()
     .then(function () {
     console.log('The database has been initialized');
@@ -48,11 +48,15 @@ app_data_source_1.bd
 });
 var app = express();
 app.use(express.json());
-app.get('/users', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.use(cors());
+// const generateAccesToken = (username => {
+//     return jwt.sign(username, )
+// });
+app.get('/tasks', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario).find()];
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).find()];
             case 1:
                 response = _a.sent();
                 res.send(response);
@@ -60,11 +64,11 @@ app.get('/users', function (req, res) { return __awaiter(void 0, void 0, void 0,
         }
     });
 }); });
-app.get('/users/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.get('/tasks/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario).findOneBy({
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).findOneBy({
                     Id: req.params.id
                 })];
             case 1:
@@ -74,14 +78,53 @@ app.get('/users/:id', function (req, res) { return __awaiter(void 0, void 0, voi
         }
     });
 }); });
-app.post('/users', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var user, results;
+app.get('/tasks/search/:name', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario).create(req.body)];
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).findOneBy({
+                    Nome: req.params.name
+                })];
             case 1:
-                user = _a.sent();
-                return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario).save(user)];
+                response = _a.sent();
+                res.send(response);
+                console.log("Fui chamada");
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.get('/urgency', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Urgencia).find()];
+            case 1:
+                response = _a.sent();
+                res.send(response);
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.get('/finish', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Concluida).find()];
+            case 1:
+                response = _a.sent();
+                res.send(response);
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.post('/tasks', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var task, results;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).create(req.body)];
+            case 1:
+                task = _a.sent();
+                return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).save(task)];
             case 2:
                 results = _a.sent();
                 res.send(results);
@@ -89,17 +132,47 @@ app.post('/users', function (req, res) { return __awaiter(void 0, void 0, void 0
         }
     });
 }); });
-app.put('/users/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.post('/register', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var user, response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Usuario).create(req.body)];
+            case 1:
+                user = _a.sent();
+                return [4 /*yield*/, index_1.database.getRepository(index_1.Usuario).save(user)];
+            case 2:
+                response = _a.sent();
+                res.send(response);
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Usuario).findOneBy({
+                    NomeUsuario: req.body.Nome,
+                    Senha: req.body.Senha
+                })];
+            case 1:
+                response = _a.sent();
+                res.send(response);
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.put('/tasks/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response, results;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario).findOneBy({
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).findOneBy({
                     Id: req.params.id
                 })];
             case 1:
                 response = _a.sent();
-                app_data_source_1.bd.getRepository(usuario_1.Usuario).merge(response, req.body);
-                return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario).save(response)];
+                index_1.database.getRepository(index_1.Tarefas).merge(response, req.body);
+                return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).save(response)];
             case 2:
                 results = _a.sent();
                 res.send(results);
@@ -107,11 +180,25 @@ app.put('/users/:id', function (req, res) { return __awaiter(void 0, void 0, voi
         }
     });
 }); });
-app["delete"]('/users/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app["delete"]('/tasks/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, app_data_source_1.bd.getRepository(usuario_1.Usuario)["delete"](req.params.id)];
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas)["delete"](req.params.id)];
+            case 1:
+                response = _a.sent();
+                res.send(response);
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.post('/tasks/search', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).findOneBy({
+                    Nome: req.body.Nome
+                })];
             case 1:
                 response = _a.sent();
                 res.send(response);

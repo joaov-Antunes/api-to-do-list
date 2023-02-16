@@ -1,9 +1,11 @@
 import * as express from 'express';
 import { Request, Response } from 'express-serve-static-core';
-import { Usuario } from './entities/usuario';
-import { bd } from './app-data-source';
+import { Tarefas, database, Urgencia, Concluida, Usuario } from './index';
+import * as jwt from 'jsonwebtoken';
+import 'dotenv-safe'
+import * as cors from 'cors';
 
-bd
+database
     .initialize()
     .then(() => {
         console.log('The database has been initialized');
@@ -13,37 +15,81 @@ bd
     });
 
 const app = express(); 
-app.use(express.json()); 
+app.use(express.json());
+app.use(cors());
 
-app.get('/users', async(req: Request, res: Response) => {
-    const response = await bd.getRepository(Usuario).find();
+// const generateAccesToken = (username => {
+//     return jwt.sign(username, )
+// });
+
+app.get('/tasks', async(req: Request, res: Response) => {
+    const response = await database.getRepository(Tarefas).find();
     res.send(response);
 });
 
-app.get('/users/:id', async(req: Request, res: Response) => {
-    const response = await bd.getRepository(Usuario).findOneBy({
+app.get('/tasks/:id', async(req: Request, res: Response) => {
+    const response = await database.getRepository(Tarefas).findOneBy({
         Id: req.params.id,
     });
     res.send(response);
 });
 
-app.post('/users', async(req: Request, res: Response) => {
-    const user = await bd.getRepository(Usuario).create(req.body);
-    const results = await bd.getRepository(Usuario).save(user);
+app.get('/tasks/search/:name', async(req: Request, res: Response) => {
+    const response = await database.getRepository(Tarefas).findOneBy({
+        Nome: req.params.name,
+    });
+    res.send(response);
+    console.log("Fui chamada")
+});
+
+app.get('/urgency', async(req: Request, res: Response) => {
+    const response = await database.getRepository(Urgencia).find();
+    res.send(response);
+});
+
+app.get('/finish', async(req: Request, res: Response) => {
+    const response = await database.getRepository(Concluida).find();
+    res.send(response);
+});
+
+app.post('/tasks', async(req: Request, res: Response) => {
+    const task = await database.getRepository(Tarefas).create(req.body);
+    const results = await database.getRepository(Tarefas).save(task);
     res.send(results);
 });
 
-app.put('/users/:id', async(req: Request, res: Response) => {
-    const response = await bd.getRepository(Usuario).findOneBy({
+app.post('/register', async(req: Request, res: Response) => {
+    const user = await database.getRepository(Usuario).create(req.body);
+    const response = await database.getRepository(Usuario).save(user);
+    res.send(response);
+});
+
+app.post('/login', async(req: Request, res: Response) => {
+    const response = await database.getRepository(Usuario).findOneBy({
+        NomeUsuario: req.body.Nome,
+        Senha: req.body.Senha
+    });
+    res.send(response);
+});
+
+app.put('/tasks/:id', async(req: Request, res: Response) => {
+    const response = await database.getRepository(Tarefas).findOneBy({
         Id: req.params.id
     });
-    bd.getRepository(Usuario).merge(response, req.body);
-    const results = await bd.getRepository(Usuario).save(response);
+    database.getRepository(Tarefas).merge(response, req.body);
+    const results = await database.getRepository(Tarefas).save(response);
     res.send(results);
 });
 
-app.delete('/users/:id', async(req: Request, res: Response) => {
-    const response = await bd.getRepository(Usuario).delete(req.params.id);
+app.delete('/tasks/:id', async(req: Request, res: Response) => {
+    const response = await database.getRepository(Tarefas).delete(req.params.id);
+    res.send(response);
+});
+
+app.post('/tasks/search', async(req: Request, res: Response) => {
+    const response = await database.getRepository(Tarefas).findOneBy({
+        Nome: req.body.Nome
+    });
     res.send(response);
 });
 

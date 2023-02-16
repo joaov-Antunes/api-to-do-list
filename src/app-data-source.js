@@ -1,16 +1,17 @@
 "use strict";
 exports.__esModule = true;
-exports.bd = void 0;
+exports.database = void 0;
 var typeorm_1 = require("typeorm");
-var bd = new typeorm_1.DataSource({
+var database = new typeorm_1.DataSource({
     type: "mysql",
     host: "localhost",
     port: 3306,
     username: "root",
     password: "joseaa",
-    database: "test",
-    entities: ["src/entities/usuario.js"],
+    database: "todolist",
+    entities: ["src/entities/Tarefas.js", "src/entities/Urgencia.js", "src/entities/Concluida.js", "src/entities/Usuario.js"],
+    migrations: ["src/migration/1676301074444-PostRefactoring.js"],
     logging: true,
     synchronize: true
 });
-exports.bd = bd;
+exports.database = database;

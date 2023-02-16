@@ -6,26 +6,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 exports.__esModule = true;
-exports.Usuario = void 0;
+exports.Concluida = void 0;
 var typeorm_1 = require("typeorm");
-var Usuario = /** @class */ (function () {
-    function Usuario() {
+var Concluida = /** @class */ (function () {
+    function Concluida() {
     }
     __decorate([
         (0, typeorm_1.PrimaryGeneratedColumn)({ type: "int", name: "Id" })
-    ], Usuario.prototype, "Id");
+    ], Concluida.prototype, "Id");
     __decorate([
-        (0, typeorm_1.Column)("varchar", { name: "Nome", nullable: true, length: 255 })
-    ], Usuario.prototype, "Nome");
-    __decorate([
-        (0, typeorm_1.Column)("varchar", { name: "NomeUsuario", nullable: true, length: 20 })
-    ], Usuario.prototype, "NomeUsuario");
-    __decorate([
-        (0, typeorm_1.Column)("varchar", { name: "Senha", nullable: true, length: 20 })
-    ], Usuario.prototype, "Senha");
-    Usuario = __decorate([
-        (0, typeorm_1.Entity)("usuario", { schema: "todolist" })
-    ], Usuario);
-    return Usuario;
+        (0, typeorm_1.Column)("varchar", { name: "Feita", nullable: true, length: 20 })
+    ], Concluida.prototype, "Feita");
+    Concluida = __decorate([
+        (0, typeorm_1.Entity)("concluida", { schema: "todolist" })
+    ], Concluida);
+    return Concluida;
 }());
-exports.Usuario = Usuario;
+exports.Concluida = Concluida;
