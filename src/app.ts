@@ -2,7 +2,8 @@ import * as express from 'express';
 import { Request, Response } from 'express-serve-static-core';
 import { Tarefas, database, Urgencia, Concluida, Usuario } from './index';
 import * as jwt from 'jsonwebtoken';
-import 'dotenv-safe'
+import * as dotenv from 'dotenv-safe';
+require('dotenv').config();
 import * as cors from 'cors';
 
 database
@@ -18,9 +19,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// const generateAccesToken = (username => {
-//     return jwt.sign(username, )
-// });
+const verifyLogin = ((req: Request, res: Response) => {
+    const token  = req.headers['x-acces-token'];
+    if(!token) return res.status(401).json({auth: false, message: 'Nenhum Token Existente'});
+})
 
 app.get('/tasks', async(req: Request, res: Response) => {
     const response = await database.getRepository(Tarefas).find();
@@ -69,7 +71,14 @@ app.post('/login', async(req: Request, res: Response) => {
         NomeUsuario: req.body.Nome,
         Senha: req.body.Senha
     });
-    res.send(response);
+    if(response != null) {
+        const token = jwt.sign({Id: response.Id}, 'Jv410551', {
+            expiresIn: 300
+        });
+        return res.json({ auth: true, token: token, response: response });
+    }
+
+    return res.status(400).json({message: 'Login Invalido'});
 });
 
 app.put('/tasks/:id', async(req: Request, res: Response) => {

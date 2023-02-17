@@ -38,7 +38,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var express = require("express");
 var index_1 = require("./index");
-require("dotenv-safe");
+var jwt = require("jsonwebtoken");
+require('dotenv').config();
 var cors = require("cors");
 index_1.database
     .initialize()
@@ -50,9 +51,11 @@ index_1.database
 var app = express();
 app.use(express.json());
 app.use(cors());
-// const generateAccesToken = (username => {
-//     return jwt.sign(username, )
-// });
+var verifyLogin = (function (req, res) {
+    var token = req.headers['x-acces-token'];
+    if (!token)
+        return res.status(401).json({ auth: false, message: 'Nenhum Token Existente' });
+});
 app.get('/tasks', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response;
     return __generator(this, function (_a) {
@@ -149,7 +152,7 @@ app.post('/register', function (req, res) { return __awaiter(void 0, void 0, voi
     });
 }); });
 app.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var response;
+    var response, token;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Usuario).findOneBy({
@@ -158,8 +161,13 @@ app.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0
                 })];
             case 1:
                 response = _a.sent();
-                res.send(response);
-                return [2 /*return*/];
+                if (response != null) {
+                    token = jwt.sign({ Id: response.Id }, 'Jv410551', {
+                        expiresIn: 300
+                    });
+                    return [2 /*return*/, res.json({ auth: true, token: token, response: response })];
+                }
+                return [2 /*return*/, res.status(400).json({ message: 'Login Invalido' })];
         }
     });
 }); });
