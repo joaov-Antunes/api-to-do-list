@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var express = require("express");
 var index_1 = require("./index");
-require("dotenv-safe");
+var jwt = require("jsonwebtoken");
 var cors = require("cors");
 index_1.database
     .initialize()
@@ -50,9 +50,20 @@ index_1.database
 var app = express();
 app.use(express.json());
 app.use(cors());
-// const generateAccesToken = (username => {
-//     return jwt.sign(username, )
-// });
+var verifyJwt = (function (req, res, next) {
+    var token = req.headers['x-access-token'] || req.body.token;
+    if (!token)
+        return res.status(410).json({ auth: false, message: 'Nenhum token existente' });
+    jwt.verify(token, verifyJwt, 'Jv410551', function (err, decoded) {
+        if (err) {
+            return res.status(500).json({ auth: false, message: 'Failed to authenticate the token' });
+        }
+        else {
+            console.log(token);
+            next();
+        }
+    });
+});
 app.get('/tasks', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response;
     return __generator(this, function (_a) {
@@ -149,7 +160,7 @@ app.post('/register', function (req, res) { return __awaiter(void 0, void 0, voi
     });
 }); });
 app.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var response;
+    var response, token;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Usuario).findOneBy({
@@ -158,7 +169,16 @@ app.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0
                 })];
             case 1:
                 response = _a.sent();
-                res.send(response);
+                if (response != null) {
+                    token = jwt.sign({ Id: response.Id }, 'Jv410551', {
+                        expiresIn: 300
+                    });
+                    res.set('x-access-token', token);
+                    return [2 /*return*/, res.json({ auth: true, token: token, response: response })];
+                }
+                else {
+                    res.status(500).json({ messge: 'Login inválido' });
+                }
                 return [2 /*return*/];
         }
     });
