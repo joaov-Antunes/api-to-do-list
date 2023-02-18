@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { Request, Response } from 'express-serve-static-core';
+import { Request, Response, NextFunction } from 'express-serve-static-core';
 import { Tarefas, database, Urgencia, Concluida, Usuario } from './index';
 import * as jwt from 'jsonwebtoken';
 import * as dotenv from 'dotenv-safe';
