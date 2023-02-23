@@ -1,6 +1,8 @@
 import * as express from 'express';
 import { Request, Response, NextFunction } from 'express-serve-static-core';
 import { Tarefas, database, Urgencia, Concluida, Usuario } from './index';
+import * as dotenv from 'dotenv';
+dotenv.config();
 import * as jwt from 'jsonwebtoken';
 import * as cors from 'cors';
 
@@ -21,7 +23,7 @@ const verifyJwt = ((req: Request, res: Response, next: NextFunction) => {
     const token: string  = req.headers['x-access-token'] || req.body.token;
     if(!token) return res.status(410).json({ auth: false, message: 'Nenhum token existente' });
 
-    jwt.verify(token, verifyJwt, 'Jv410551', (err: Error, decoded: DecodeSuccessCallback) => {
+    jwt.verify(token, 'Jv410551', (err: Error, decoded: DecodeSuccessCallback) => {
         if(err) {
             return res.status(500).json({ auth: false, message: 'Failed to authenticate the token' })
         } else {
@@ -31,7 +33,7 @@ const verifyJwt = ((req: Request, res: Response, next: NextFunction) => {
     });
 });
 
-app.get('/tasks', async(req: Request, res: Response) => {
+app.get('/tasks',verifyJwt, async(req: Request, res: Response) => {
     const response = await database.getRepository(Tarefas).find();
     res.send(response);
 });
@@ -62,7 +64,7 @@ app.get('/finish', async(req: Request, res: Response) => {
 });
 
 app.post('/tasks', async(req: Request, res: Response) => {
-    const task = await database.getRepository(Tarefas).create(req.body);
+    const task = database.getRepository(Tarefas).create(req.body);
     const results = await database.getRepository(Tarefas).save(task);
     res.send(results);
 });
@@ -80,13 +82,12 @@ app.post('/login', async(req: Request, res: Response) => {
     });
     if (response != null) {
         const token = jwt.sign({ Id: response.Id }, 'Jv410551', {
-            expiresIn: 300
+            expiresIn: 3000
         });
         res.set('x-access-token', token);
-        return res.json({ auth: true, token: token, response: response});
-        
-    } else { 
-        res.status(500).json({messge: 'Login inválido'});
+        return res.json({ auth: true, token: token, response: response});    
+    } else {
+        res.send(response);
     }
 });
 
@@ -111,7 +112,7 @@ app.post('/tasks/search', async(req: Request, res: Response) => {
     res.send(response);
 });
 
-const port: number = 3000;
+const port = 3000 || process.env.PORT;
 app.listen(port, () => { 
-    console.log(`Servidor rodando na port ${port}`);
+    console.log(`Servidor rodando na porta ${port}`);
 });

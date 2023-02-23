@@ -38,6 +38,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var express = require("express");
 var index_1 = require("./index");
+var dotenv = require("dotenv");
+dotenv.config();
 var jwt = require("jsonwebtoken");
 var cors = require("cors");
 index_1.database
@@ -54,7 +56,7 @@ var verifyJwt = (function (req, res, next) {
     var token = req.headers['x-access-token'] || req.body.token;
     if (!token)
         return res.status(410).json({ auth: false, message: 'Nenhum token existente' });
-    jwt.verify(token, verifyJwt, 'Jv410551', function (err, decoded) {
+    jwt.verify(token, 'Jv410551', function (err, decoded) {
         if (err) {
             return res.status(500).json({ auth: false, message: 'Failed to authenticate the token' });
         }
@@ -64,7 +66,7 @@ var verifyJwt = (function (req, res, next) {
         }
     });
 });
-app.get('/tasks', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+app.get('/tasks', verifyJwt, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -133,11 +135,10 @@ app.post('/tasks', function (req, res) { return __awaiter(void 0, void 0, void 0
     var task, results;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).create(req.body)];
-            case 1:
-                task = _a.sent();
+            case 0:
+                task = index_1.database.getRepository(index_1.Tarefas).create(req.body);
                 return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).save(task)];
-            case 2:
+            case 1:
                 results = _a.sent();
                 res.send(results);
                 return [2 /*return*/];
@@ -171,13 +172,13 @@ app.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0
                 response = _a.sent();
                 if (response != null) {
                     token = jwt.sign({ Id: response.Id }, 'Jv410551', {
-                        expiresIn: 300
+                        expiresIn: 3000
                     });
                     res.set('x-access-token', token);
                     return [2 /*return*/, res.json({ auth: true, token: token, response: response })];
                 }
                 else {
-                    res.status(500).json({ messge: 'Login inválido' });
+                    res.send(response);
                 }
                 return [2 /*return*/];
         }
@@ -227,7 +228,7 @@ app.post('/tasks/search', function (req, res) { return __awaiter(void 0, void 0,
         }
     });
 }); });
-var port = 3000;
+var port = 3000 || process.env.PORT;
 app.listen(port, function () {
-    console.log("Servidor rodando na port ".concat(port));
+    console.log("Servidor rodando na porta ".concat(port));
 });
