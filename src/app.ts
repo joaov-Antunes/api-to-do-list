@@ -89,6 +89,8 @@ app.post('/login', async(req: Request, res: Response) => {
     } else {
         res.send(response);
     }
+
+    return res.status(400).json({message: 'Login Invalido'});
 });
 
 app.put('/tasks/:id', async(req: Request, res: Response) => {

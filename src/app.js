@@ -180,7 +180,7 @@ app.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0
                 else {
                     res.send(response);
                 }
-                return [2 /*return*/];
+                return [2 /*return*/, res.status(400).json({ message: 'Login Invalido' })];
         }
     });
 }); });
