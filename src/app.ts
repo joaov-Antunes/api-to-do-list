@@ -1,8 +1,7 @@
 import * as express from 'express';
 import { Request, Response, NextFunction } from 'express-serve-static-core';
 import { Tarefas, database, Urgencia, Concluida, Usuario } from './index';
-import * as dotenv from 'dotenv';
-dotenv.config();
+import 'dotenv/config';
 import * as jwt from 'jsonwebtoken';
 import * as cors from 'cors';
 
@@ -23,7 +22,7 @@ const verifyJwt = ((req: Request, res: Response, next: NextFunction) => {
     const token: string  = req.headers['x-access-token'] || req.body.token;
     if(!token) return res.status(410).json({ auth: false, message: 'Nenhum token existente' });
 
-    jwt.verify(token, 'Jv410551', (err: Error, decoded: DecodeSuccessCallback) => {
+    jwt.verify(token, process.env.SECRET, (err: Error, decoded: DecodeSuccessCallback) => {
         if(err) {
             return res.status(500).json({ auth: false, message: 'Failed to authenticate the token' })
         } else {
@@ -33,8 +32,13 @@ const verifyJwt = ((req: Request, res: Response, next: NextFunction) => {
     });
 });
 
-app.get('/tasks',verifyJwt, async(req: Request, res: Response) => {
+app.get('/tasks', verifyJwt, async(req: Request, res: Response) => {
     const response = await database.getRepository(Tarefas).find();
+    res.send(response);
+});
+
+app.get('/numberoftasks', async(req: Request, res: Response) => {
+    const response = await database.query("SELECT u.Nivel, COUNT(t.Nome) AS qtd FROM Tarefas t INNER JOIN urgencia u ON u.Nivel = t.Urgencia GROUP BY u.Nivel");
     res.send(response);
 });
 
@@ -81,13 +85,10 @@ app.post('/login', async(req: Request, res: Response) => {
         Senha: req.body.Senha
     });
     if (response != null) {
-        const token = jwt.sign({ Id: response.Id }, 'Jv410551', {
+        const token = jwt.sign({ Id: response.Id }, process.env.SECRET, {
             expiresIn: 3000
         });
-        res.set('x-access-token', token);
         return res.json({ auth: true, token: token, response: response});    
-    } else {
-        res.send(response);
     }
 
     return res.status(400).json({message: 'Login Invalido'});
@@ -114,7 +115,7 @@ app.post('/tasks/search', async(req: Request, res: Response) => {
     res.send(response);
 });
 
-const port = 3000 || process.env.PORT;
+const port = process.env.PORT;
 app.listen(port, () => { 
     console.log(`Servidor rodando na porta ${port}`);
 });

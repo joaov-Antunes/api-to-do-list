@@ -8,6 +8,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 exports.__esModule = true;
 exports.Usuario = void 0;
 var typeorm_1 = require("typeorm");
+var Tarefas_1 = require("./Tarefas");
 var Usuario = /** @class */ (function () {
     function Usuario() {
     }
@@ -23,6 +24,9 @@ var Usuario = /** @class */ (function () {
     __decorate([
         (0, typeorm_1.Column)("varchar", { name: "Senha", nullable: true, length: 20 })
     ], Usuario.prototype, "Senha");
+    __decorate([
+        (0, typeorm_1.OneToMany)(function () { return Tarefas_1.Tarefas; }, function (Tarefas) { return Tarefas.Usuario; })
+    ], Usuario.prototype, "Tarefas");
     Usuario = __decorate([
         (0, typeorm_1.Entity)("usuario", { schema: "todolist" })
     ], Usuario);

@@ -38,8 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var express = require("express");
 var index_1 = require("./index");
-var dotenv = require("dotenv");
-dotenv.config();
+require("dotenv/config");
 var jwt = require("jsonwebtoken");
 var cors = require("cors");
 index_1.database
@@ -56,7 +55,7 @@ var verifyJwt = (function (req, res, next) {
     var token = req.headers['x-access-token'] || req.body.token;
     if (!token)
         return res.status(410).json({ auth: false, message: 'Nenhum token existente' });
-    jwt.verify(token, 'Jv410551', function (err, decoded) {
+    jwt.verify(token, process.env.SECRET, function (err, decoded) {
         if (err) {
             return res.status(500).json({ auth: false, message: 'Failed to authenticate the token' });
         }
@@ -71,6 +70,18 @@ app.get('/tasks', verifyJwt, function (req, res) { return __awaiter(void 0, void
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).find()];
+            case 1:
+                response = _a.sent();
+                res.send(response);
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.get('/numberoftasks', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, index_1.database.query("SELECT u.Nivel, COUNT(t.Nome) AS qtd FROM Tarefas t INNER JOIN urgencia u ON u.Nivel = t.Urgencia GROUP BY u.Nivel")];
             case 1:
                 response = _a.sent();
                 res.send(response);
@@ -171,14 +182,10 @@ app.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0
             case 1:
                 response = _a.sent();
                 if (response != null) {
-                    token = jwt.sign({ Id: response.Id }, 'Jv410551', {
+                    token = jwt.sign({ Id: response.Id }, process.env.SECRET, {
                         expiresIn: 3000
                     });
-                    res.set('x-access-token', token);
                     return [2 /*return*/, res.json({ auth: true, token: token, response: response })];
-                }
-                else {
-                    res.send(response);
                 }
                 return [2 /*return*/, res.status(400).json({ message: 'Login Invalido' })];
         }
@@ -228,7 +235,7 @@ app.post('/tasks/search', function (req, res) { return __awaiter(void 0, void 0,
         }
     });
 }); });
-var port = 3000 || process.env.PORT;
+var port = process.env.PORT;
 app.listen(port, function () {
     console.log("Servidor rodando na porta ".concat(port));
 });
