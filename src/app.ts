@@ -88,7 +88,7 @@ app.post('/login', async(req: Request, res: Response) => {
         const token = jwt.sign({ Id: response.Id }, process.env.SECRET, {
             expiresIn: 3000
         });
-        return res.json({ auth: true, token: token, response: response});    
+        return res.json({ auth: true, token: token, response: response});
     }
 
     return res.status(400).json({message: 'Login Invalido'});
