@@ -51,10 +51,15 @@ index_1.database
 var app = express();
 app.use(express.json());
 app.use(cors());
-var verifyLogin = (function (req, res) {
-    var token = req.headers['x-acces-token'];
+var verifyLogin = (function (req, res, next) {
+    var token = req.headers['x-access-token'];
     if (!token)
         return res.status(401).json({ auth: false, message: 'Nenhum Token Existente' });
+    jwt.verify(JSON.stringify(token), 'Jv410551', function (err, decoded) {
+        if (err)
+            return res.status(401).json({ auth: false, message: 'Falha ao autentica o token' });
+        next();
+    });
 });
 app.get('/tasks', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response;
@@ -162,7 +167,7 @@ app.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0
             case 1:
                 response = _a.sent();
                 if (response != null) {
-                    token = jwt.sign({ Id: response.Id }, 'Jv410551', {
+                    token = jwt.sign({ id: response.Id }, 'Jv410551', {
                         expiresIn: 300
                     });
                     return [2 /*return*/, res.json({ auth: true, token: token, response: response })];

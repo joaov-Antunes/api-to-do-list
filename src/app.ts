@@ -19,10 +19,16 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const verifyLogin = ((req: Request, res: Response) => {
-    const token  = req.headers['x-acces-token'];
+const verifyLogin = ((req: Request, res: Response, next: NextFunction) => {
+    const token  = req.headers['x-access-token'];
     if(!token) return res.status(401).json({auth: false, message: 'Nenhum Token Existente'});
-})
+
+    jwt.verify(JSON.stringify(token), 'Jv410551', (err: Error, decoded: DecodeSuccessCallback) => {
+        if(err) return res.status(401).json({ auth: false, message: 'Falha ao autentica o token' });
+
+        next();
+    });
+});
 
 app.get('/tasks', async(req: Request, res: Response) => {
     const response = await database.getRepository(Tarefas).find();
@@ -72,7 +78,7 @@ app.post('/login', async(req: Request, res: Response) => {
         Senha: req.body.Senha
     });
     if(response != null) {
-        const token = jwt.sign({Id: response.Id}, 'Jv410551', {
+        const token = jwt.sign({ id: response.Id }, 'Jv410551', {
             expiresIn: 300
         });
         return res.json({ auth: true, token: token, response: response });
