@@ -14,7 +14,7 @@ import { Usuario } from "./Usuario";
 @Entity("tarefas", { schema: "todolist" })
 export class Tarefas {
   @PrimaryGeneratedColumn({ type: "int", name: "Id" })
-  Id: string;
+  Id: number;
 
   @Column("varchar", { name: "Nome", nullable: true, length: 255 })
   Nome: string | null;
@@ -50,7 +50,4 @@ export class Tarefas {
   })
   @JoinColumn([{ name: "UsuarioId", referencedColumnName: "Id" }])
   Usuario: Usuario;
-
-  @Column("varchar", { name: "Descricao", nullable: true, length: 255 })
-  Descricao: string | null;
 }

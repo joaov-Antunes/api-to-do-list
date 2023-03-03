@@ -38,8 +38,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var express = require("express");
 var index_1 = require("./index");
+require("dotenv/config");
+var multer = require("multer");
 var jwt = require("jsonwebtoken");
-require('dotenv').config();
 var cors = require("cors");
 index_1.database
     .initialize()
@@ -51,6 +52,7 @@ index_1.database
 var app = express();
 app.use(express.json());
 app.use(cors());
+<<<<<<< HEAD
 var verifyLogin = (function (req, res, next) {
     var token = req.headers['x-access-token'];
     if (!token)
@@ -60,12 +62,48 @@ var verifyLogin = (function (req, res, next) {
             return res.status(401).json({ auth: false, message: 'Falha ao autentica o token' });
         next();
     });
+=======
+var storage = multer.diskStorage({
+    destination: './src/uploads/',
+    filename: function (req, file, cb) {
+        //req.body is empty...
+        //How could I get the new_file_name property sent from client here?
+        cb(null, file.originalname);
+    }
+>>>>>>> 15c28539a35a48361a8cf1db2fcbcce8b7006a60
 });
-app.get('/tasks', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+var uploadMiddleware = multer({ storage: storage });
+var verifyJwt = (function (req, res, next) {
+    var token = req.headers['x-access-token'] || req.body.token;
+    if (!token)
+        return res.status(410).json({ auth: false, message: 'Nenhum token existente' });
+    jwt.verify(token, process.env.SECRET, function (err, decoded) {
+        if (err) {
+            return res.status(500).json({ auth: false, message: 'Failed to authenticate the token' });
+        }
+        else {
+            console.log(token);
+            next();
+        }
+    });
+});
+app.get('/tasks', verifyJwt, function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).find()];
+            case 1:
+                response = _a.sent();
+                res.send(response);
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.get('/numberoftasks', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, index_1.database.query("SELECT u.Nivel, COUNT(t.Nome) AS qtd FROM Tarefas t INNER JOIN urgencia u ON u.Nivel = t.Urgencia GROUP BY u.Nivel")];
             case 1:
                 response = _a.sent();
                 res.send(response);
@@ -130,11 +168,10 @@ app.post('/tasks', function (req, res) { return __awaiter(void 0, void 0, void 0
     var task, results;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).create(req.body)];
-            case 1:
-                task = _a.sent();
+            case 0:
+                task = index_1.database.getRepository(index_1.Tarefas).create(req.body);
                 return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).save(task)];
-            case 2:
+            case 1:
                 results = _a.sent();
                 res.send(results);
                 return [2 /*return*/];
@@ -167,13 +204,41 @@ app.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0
             case 1:
                 response = _a.sent();
                 if (response != null) {
+<<<<<<< HEAD
                     token = jwt.sign({ id: response.Id }, 'Jv410551', {
                         expiresIn: 300
+=======
+                    token = jwt.sign({ Id: response.Id }, process.env.SECRET, {
+                        expiresIn: 3000
+>>>>>>> 15c28539a35a48361a8cf1db2fcbcce8b7006a60
                     });
                     return [2 /*return*/, res.json({ auth: true, token: token, response: response })];
                 }
                 return [2 /*return*/, res.status(400).json({ message: 'Login Invalido' })];
         }
+    });
+}); });
+app.post('/tasks/search', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).findOneBy({
+                    Nome: req.body.Nome
+                })];
+            case 1:
+                response = _a.sent();
+                res.send(response);
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.post('/desc', uploadMiddleware.single('file'), function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        response = req.file;
+        console.log(response);
+        res.json({ message: response });
+        return [2 /*return*/];
     });
 }); });
 app.put('/tasks/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
@@ -206,21 +271,7 @@ app["delete"]('/tasks/:id', function (req, res) { return __awaiter(void 0, void 
         }
     });
 }); });
-app.post('/tasks/search', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var response;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).findOneBy({
-                    Nome: req.body.Nome
-                })];
-            case 1:
-                response = _a.sent();
-                res.send(response);
-                return [2 /*return*/];
-        }
-    });
-}); });
-var port = 3000;
+var port = process.env.PORT;
 app.listen(port, function () {
-    console.log("Servidor rodando na port ".concat(port));
+    console.log("Servidor rodando na porta ".concat(port));
 });

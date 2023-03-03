@@ -9,6 +9,7 @@ exports.__esModule = true;
 exports.Tarefas = void 0;
 var typeorm_1 = require("typeorm");
 var Urgencia_1 = require("./Urgencia");
+var Usuario_1 = require("./Usuario");
 var Tarefas = /** @class */ (function () {
     function Tarefas() {
     }
@@ -34,14 +35,25 @@ var Tarefas = /** @class */ (function () {
         (0, typeorm_1.Column)("tinyint", { name: "StatusTarefa", nullable: true, width: 1 })
     ], Tarefas.prototype, "StatusTarefa");
     __decorate([
+        (0, typeorm_1.Column)("int", { name: "UsuarioId", nullable: true })
+    ], Tarefas.prototype, "UsuarioId");
+    __decorate([
         (0, typeorm_1.ManyToOne)(function () { return Urgencia_1.Urgencia; }, function (Urgencia) { return Urgencia.Tarefas; }, {
             onDelete: "RESTRICT",
             onUpdate: "RESTRICT"
         }),
         (0, typeorm_1.JoinColumn)([{ name: "IdUrgencia", referencedColumnName: "Id" }])
     ], Tarefas.prototype, "IdUrgencia2");
+    __decorate([
+        (0, typeorm_1.ManyToOne)(function () { return Usuario_1.Usuario; }, function (Usuario) { return Usuario.Tarefas; }, {
+            onDelete: "RESTRICT",
+            onUpdate: "RESTRICT"
+        }),
+        (0, typeorm_1.JoinColumn)([{ name: "UsuarioId", referencedColumnName: "Id" }])
+    ], Tarefas.prototype, "Usuario");
     Tarefas = __decorate([
         (0, typeorm_1.Index)("IdUrgencia", ["IdUrgencia"], {}),
+        (0, typeorm_1.Index)("UsuarioId", ["UsuarioId"], {}),
         (0, typeorm_1.Entity)("tarefas", { schema: "todolist" })
     ], Tarefas);
     return Tarefas;
