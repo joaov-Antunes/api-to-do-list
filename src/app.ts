@@ -2,6 +2,9 @@ import * as express from 'express';
 import { Request, Response, NextFunction } from 'express-serve-static-core';
 import { Tarefas, database, Urgencia, Concluida, Usuario } from './index';
 import 'dotenv/config';
+import * as multer from 'multer';
+import multipart from 'connect-multiparty';
+import * as fs from 'fs';
 import * as jwt from 'jsonwebtoken';
 import * as cors from 'cors';
 
@@ -17,6 +20,17 @@ database
 const app = express(); 
 app.use(express.json());
 app.use(cors());
+
+let storage = multer.diskStorage(
+    {
+        destination: './src/uploads/',
+        filename: function ( req, file, cb ) {
+            cb( null, file.originalname);
+        }
+    }
+);
+
+const uploadMiddleware = multer({ storage: storage })
 
 const verifyJwt = ((req: Request, res: Response, next: NextFunction) => {
     const token: string  = req.headers['x-access-token'] || req.body.token;
@@ -94,6 +108,19 @@ app.post('/login', async(req: Request, res: Response) => {
     return res.status(400).json({message: 'Login Invalido'});
 });
 
+app.post('/tasks/search', async(req: Request, res: Response) => {
+    const response = await database.getRepository(Tarefas).findOneBy({
+        Nome: req.body.Nome
+    });
+    res.send(response);
+});
+
+app.post('/desc', uploadMiddleware.single('file'), async(req: Request, res: Response) => {
+    const response = req.file;
+    console.log(response);
+    res.json({ message: response });
+})
+
 app.put('/tasks/:id', async(req: Request, res: Response) => {
     const response = await database.getRepository(Tarefas).findOneBy({
         Id: req.params.id
@@ -105,13 +132,6 @@ app.put('/tasks/:id', async(req: Request, res: Response) => {
 
 app.delete('/tasks/:id', async(req: Request, res: Response) => {
     const response = await database.getRepository(Tarefas).delete(req.params.id);
-    res.send(response);
-});
-
-app.post('/tasks/search', async(req: Request, res: Response) => {
-    const response = await database.getRepository(Tarefas).findOneBy({
-        Nome: req.body.Nome
-    });
     res.send(response);
 });
 

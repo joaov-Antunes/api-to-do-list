@@ -39,6 +39,7 @@ exports.__esModule = true;
 var express = require("express");
 var index_1 = require("./index");
 require("dotenv/config");
+var multer = require("multer");
 var jwt = require("jsonwebtoken");
 var cors = require("cors");
 index_1.database
@@ -51,6 +52,15 @@ index_1.database
 var app = express();
 app.use(express.json());
 app.use(cors());
+var storage = multer.diskStorage({
+    destination: './src/uploads/',
+    filename: function (req, file, cb) {
+        //req.body is empty...
+        //How could I get the new_file_name property sent from client here?
+        cb(null, file.originalname);
+    }
+});
+var uploadMiddleware = multer({ storage: storage });
 var verifyJwt = (function (req, res, next) {
     var token = req.headers['x-access-token'] || req.body.token;
     if (!token)
@@ -191,6 +201,29 @@ app.post('/login', function (req, res) { return __awaiter(void 0, void 0, void 0
         }
     });
 }); });
+app.post('/tasks/search', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).findOneBy({
+                    Nome: req.body.Nome
+                })];
+            case 1:
+                response = _a.sent();
+                res.send(response);
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.post('/desc', uploadMiddleware.single('file'), function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var response;
+    return __generator(this, function (_a) {
+        response = req.file;
+        console.log(response);
+        res.json({ message: response });
+        return [2 /*return*/];
+    });
+}); });
 app.put('/tasks/:id', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
     var response, results;
     return __generator(this, function (_a) {
@@ -214,20 +247,6 @@ app["delete"]('/tasks/:id', function (req, res) { return __awaiter(void 0, void 
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas)["delete"](req.params.id)];
-            case 1:
-                response = _a.sent();
-                res.send(response);
-                return [2 /*return*/];
-        }
-    });
-}); });
-app.post('/tasks/search', function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
-    var response;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, index_1.database.getRepository(index_1.Tarefas).findOneBy({
-                    Nome: req.body.Nome
-                })];
             case 1:
                 response = _a.sent();
                 res.send(response);

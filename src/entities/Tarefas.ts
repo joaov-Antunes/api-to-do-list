@@ -50,4 +50,7 @@ export class Tarefas {
   })
   @JoinColumn([{ name: "UsuarioId", referencedColumnName: "Id" }])
   Usuario: Usuario;
+
+  @Column("varchar", { name: "Descricao", nullable: true, length: 255 })
+  Descricao: string | null;
 }
